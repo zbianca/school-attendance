@@ -1,42 +1,12 @@
-/* STUDENTS IGNORE THIS FUNCTION
- * All this does is create an initial
- * attendance record if one is not found
- * within localStorage.
- */
-((() => {
-    if (!localStorage.attendance) {
-        console.log('Creating attendance records...');
-        function getRandom() {
-            return (Math.random() >= 0.5);
-        }
-
-        const nameColumns = $('tbody .name-col');
-        const attendance = {};
-
-        nameColumns.each(function() {
-            const name = this.innerText;
-            attendance[name] = [];
-
-            for (let i = 0; i <= 11; i++) {
-                attendance[name].push(getRandom());
-            }
-        });
-
-        localStorage.attendance = JSON.stringify(attendance);
-    }
-})());
-
-/* STUDENT APPLICATION */
-
 /* Model */
 
 const model = {
     students: [
-        { name: 'Slappy the Frog', attendance: [true, true, false, false, false, false, false, false, false, false, false, false]},
-        { name: 'Lilly the Lizard', attendance: [false, true, false, false, false, false, false, false, false, false, false, false]},
-        { name: 'Paulrus the Walrus', attendance: [true, true, false, false, false, false, false, false, false, false, false, false]},
-        { name: 'Gregory the Goat', attendance: [true, true, false, false, false, false, false, false, false, false, false, false]},
-        { name: 'Adam the Anaconda', attendance: [false, true, false, false, false, true, false, false, false, false, false, true]}
+        { name: 'Slappy the Frog', attendance: [false, false, false, false, false, false, false, false, false, false, false, false]},
+        { name: 'Lilly the Lizard', attendance: [false, false, false, false, false, false, false, false, false, false, false, false]},
+        { name: 'Paulrus the Walrus', attendance: [false, false, false, false, false, false, false, false, false, false, false, false]},
+        { name: 'Gregory the Goat', attendance: [false, false, false, false, false, false, false, false, false, false, false, false]},
+        { name: 'Adam the Anaconda', attendance: [false, false, false, false, false, false, false, false, false, false, false, false]}
     ]
 };
 
@@ -70,7 +40,7 @@ const studentsDom = {
 
 const octopus = {
     init: function(model) {
-        this.model = model;
+        this.model = localStorage.attendance ? JSON.parse(localStorage.attendance) : model;
         studentsDom.init();
     },
 
@@ -86,7 +56,13 @@ const octopus = {
         this.model.students[student].attendance[day] = !this.model.students[student].attendance[day];
         const missedTd = document.querySelector(`#student${student} .missed-col`);
         missedTd.innerHTML = this.countMissed(student);
+        this.saveLocally(this.model);
+    },
+
+    saveLocally: function(data) {
+        localStorage.setItem('attendance', JSON.stringify(data));
     }
+
 };
 
 octopus.init(model);
