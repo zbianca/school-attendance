@@ -40,48 +40,53 @@ const model = {
     ]
 };
 
-
 /* View */
 
 const studentsDom = {
+
     init: function() {
-        this.tbody = document.querySelector('tbody');
-        this.renderHTML();
-    },
-
-    renderHTML: function() {
-
-        this.tbody.innerHTML = octopus.getStudents().map((student, index) =>
+        const tbody = document.querySelector('tbody');
+        tbody.innerHTML = octopus.getStudents().map((student, index) =>
 
             `<tr id="student${index}">
             <td class="name-col">${student['name']}</td>` +
 
             student.attendance.map((present, i) => {
                 let checked = present ? 'checked' : '';
-                return `<td class="attend-col"><input data-day="${i}" type="checkbox" ${checked}></td>`;
+                return `<td class="attend-col"><input data-student="${index}" data-day="${i}" type="checkbox" ${checked} onclick="octopus.updateModel(this.dataset.student,this.dataset.day);"></td>`;
             }).join('\n')
 
             + `<td class="missed-col">` +
 
-            student.attendance.filter(item => item === false).length
+            octopus.countMissed(index)
 
             + `</td>
             </tr>`).join('');
-
-    },
+    }
 
 };
 
 /* Controller */
 
 const octopus = {
-    init: function() {
+    init: function(model) {
+        this.model = model;
         studentsDom.init();
     },
 
     getStudents: function() {
-        return model.students;
+        return this.model.students;
+    },
+
+    countMissed: function(i) {
+        return this.model.students[i].attendance.filter(item => item === false).length;
+    },
+
+    updateModel: function(student, day) {
+        this.model.students[student].attendance[day] = !this.model.students[student].attendance[day];
+        const missedTd = document.querySelector(`#student${student} .missed-col`);
+        missedTd.innerHTML = this.countMissed(student);
     }
 };
 
-octopus.init();
+octopus.init(model);
