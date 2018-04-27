@@ -50,52 +50,25 @@ const studentsDom = {
     },
 
     renderHTML: function() {
-        const studentsHtml = octopus.getStudents().map((listObj, index) =>
+
+        this.tbody.innerHTML = octopus.getStudents().map((student, index) =>
+
             `<tr id="student${index}">
-            <td class="name-col">${listObj['name']}</td>
-            <td class="attend-col"><input data-day="0" type="checkbox"></td>
-            <td class="attend-col"><input data-day="1" type="checkbox"></td>
-            <td class="attend-col"><input data-day="2" type="checkbox"></td>
-            <td class="attend-col"><input data-day="3" type="checkbox"></td>
-            <td class="attend-col"><input data-day="4" type="checkbox"></td>
-            <td class="attend-col"><input data-day="5" type="checkbox"></td>
-            <td class="attend-col"><input data-day="9" type="checkbox"></td>
-            <td class="attend-col"><input data-day="7" type="checkbox"></td>
-            <td class="attend-col"><input data-day="8" type="checkbox"></td>
-            <td class="attend-col"><input data-day="9" type="checkbox"></td>
-            <td class="attend-col"><input data-day="10" type="checkbox"></td>
-            <td class="attend-col"><input data-day="11" type="checkbox"></td>
-            <td class="missed-col">0</td>
-            </tr>`);
-        this.tbody.innerHTML = studentsHtml.join('');
-        this.renderDb();
-    },
+            <td class="name-col">${student['name']}</td>` +
 
-    renderDb: function() {
-        this.data = octopus.getStudents()
-        for (let x = 0; x < this.data.length; x++) {
-            let select = `#student${x}`;
-            this.renderMissed(x);
-            const attendance = this.data[x].attendance;
-            for (let z = 0; z < attendance.length; z++) {
-                const selector = `${select} input[data-day="${z}"]`;
-                this.importDb(selector, x, z);
-            }
-        }
-    },
+            student.attendance.map((present, i) => {
+                let checked = present ? 'checked' : '';
+                return `<td class="attend-col"><input data-day="${i}" type="checkbox" ${checked}></td>`;
+            }).join('\n')
 
-    importDb: function(selector, x, z) {
-        const elem = document.querySelector(selector);
-        const dataBoolean = this.data[x].attendance[z];
-        if (dataBoolean) {
-            elem.checked = true;
-        }
-    },
+            + `<td class="missed-col">` +
 
-    renderMissed: function(x) {
-        const elem = document.querySelector(`#student${x} .missed-col`);
-        elem.innerHTML = this.data[x].attendance.filter(item => item === false).length;
-    }
+            student.attendance.filter(item => item === false).length
+
+            + `</td>
+            </tr>`).join('');
+
+    },
 
 };
 
